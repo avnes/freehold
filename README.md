@@ -1,6 +1,6 @@
-# valyria-host
+# freehold
 
-Configure a CentOS Stream server for virtualization with libvirt.
+Configure a CentOS Stream server for virtualization with libvirt on my home server called 'freehold'.
 It will also setup automatic security patching.
 
 ## Requirements
