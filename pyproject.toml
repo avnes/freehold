@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "valyria-host"
+name = "freehold"
 version = "0.1.0"
 description = "Configure a CentOS Stream server for virtualization"
 authors = ["Audun Nes <audun.nes@gmail.com>"]
