@@ -62,7 +62,22 @@ echo "/dev/mapper/cs-data     /data                   xfs     defaults        0 
 ## Setup CoreDNS
 
 ```bash
-./coredns
+useradd coredns -s /sbin/nologin -c 'coredns user'
+
+curl -LO https://github.com/coredns/coredns/releases/download/v1.9.3/coredns_1.9.3_linux_amd64.tgz
+tar zxvf coredns_1.9.3_linux_amd64.tgz
+chmod +x coredns
+sudo mv coredns /usr/bin
+rm zxvf coredns_1.9.3_linux_amd64.tgz
+
+cp coredns.service /usr/lib/systemd/system/coredns.service
+chmod +x /usr/lib/systemd/system/coredns.service
+mkdir -p /etc/coredns
+cp Corefile /etc/coredns
+
+systemctl enable coredns
+systemctl start coredns
+
 firewall-cmd --permanent --zone=public --add-port=53/tcp
 firewall-cmd --permanent --zone=public --add-port=53/udp
 firewall-cmd --reload
