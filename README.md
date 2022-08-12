@@ -59,3 +59,11 @@ Add new data partition to automount:
 ```bash
 echo "/dev/mapper/cs-data     /data                   xfs     defaults        0 0" >> /etc/fstab
 ```
+## Setup CoreDNS
+
+```bash
+./coredns
+firewall-cmd --permanent --zone=public --add-port=53/tcp
+firewall-cmd --permanent --zone=public --add-port=53/udp
+firewall-cmd --reload
+```
