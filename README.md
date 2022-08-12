@@ -81,4 +81,7 @@ systemctl start coredns
 firewall-cmd --permanent --zone=public --add-port=53/tcp
 firewall-cmd --permanent --zone=public --add-port=53/udp
 firewall-cmd --reload
+
+# On my VMs, I can now use this new DNS server:
+# curl https://raw.githubusercontent.com/avnes/freehold/main/vm-dns-override.sh | bash
 ```
