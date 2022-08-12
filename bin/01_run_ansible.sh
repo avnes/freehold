@@ -20,4 +20,4 @@ printf "\n\n############### Installing Ansible ###############\n"
 poetry install
 
 printf "\n\n############### Run Ansible ###############\n"
-poetry run ansible-playbook --inventory ansible/inventory/hosts.yaml ansible/playbook.yaml --check
+poetry run ansible-playbook --inventory ansible/inventory/hosts.yaml ansible/playbook.yaml
