@@ -1,0 +1,4 @@
+. {
+    bind 10.0.1.74
+    hosts /etc/hosts
+}
