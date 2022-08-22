@@ -106,57 +106,86 @@
       ip link set ens8u1 up
       ip link set ens8u1 master br0
       ip address add dev br0 10.0.2.74/24
-
-      
-      cat <<EOF | tee /etc/sysconfig/network-scripts/ifcfg-br0
-DEVICE=br0
-TYPE=Bridge
-BOOTPROTO=none
-IPADDR=10.0.2.74
-GATEWAY=10.0.0.1
-NETMASK=255.255.255.0
-ONBOOT=yes
-DELAY=0
-NM_CONTROLLED=0
-EOF
-
-    cat <<EOF | tee /etc/sysconfig/network-scripts/ifcfg-ens8u1
-TYPE=ethernet
-BOOTPROTO=none
-NAME=ens8u1
-DEVICE=ens8u1
-ONBOOT=yes
-BRIDGE=br0
-DELAY=0
-NM_CONTROLLED=0
-EOF
-
-    cat <<EOF | tee /etc/sysctl.d/99-netfilter-bridge.conf
-net.bridge.bridge-nf-call-ip6tables = 0
-net.bridge.bridge-nf-call-iptables = 0
-net.bridge.bridge-nf-call-arptables = 0
-EOF
-
-    modprobe br_netfilter
-    
-    cat <<EOF | tee /etc/modules-load.d/br_netfilter.conf
-br_netfilter
-EOF
-
-    sysctl -p /etc/sysctl.d/99-netfilter-bridge.conf
-
-    cat <<EOF | tee /tmp/bridged-network.xml
-<network>
-    <name>bridged-network</name>
-    <forward mode="bridge" />
-    <bridge name="br0" />
-</network>
-EOF
-
-    virsh net-define /tmp/bridged-network.xml
-    virsh net-start bridged-network
-    virsh net-autostart bridged-network
   args:
     executable: /bin/bash
-  failed_when:
+  failed_when: false
+  changed_when: false
+
+- name: Create network script ifcfg-br0
+  ansible.builtin.copy:
+    content: |
+      DEVICE=br0
+      TYPE=Bridge
+      BOOTPROTO=none
+      IPADDR=10.0.2.74
+      GATEWAY=10.0.0.1
+      NETMASK=255.255.255.0
+      ONBOOT=yes
+      DELAY=0
+      NM_CONTROLLED=0
+    dest: /etc/sysconfig/network-scripts/ifcfg-br0
+    mode: "0644"
+
+- name: Create network script ifcfg-ens8u1
+  ansible.builtin.copy:
+    content: |
+      TYPE=ethernet
+      BOOTPROTO=none
+      NAME=ens8u1
+      DEVICE=ens8u1
+      ONBOOT=yes
+      BRIDGE=br0
+      DELAY=0
+      NM_CONTROLLED=0
+    dest: /etc/sysconfig/network-scripts/ifcfg-ens8u1
+    mode: "0644"
+
+- name: Create netfilter bridge
+  ansible.builtin.copy:
+    content: |
+      net.bridge.bridge-nf-call-ip6tables = 0
+      net.bridge.bridge-nf-call-iptables = 0
+      net.bridge.bridge-nf-call-arptables = 0
+    dest: /etc/sysctl.d/99-netfilter-bridge.conf
+    mode: "0644"
+
+- name: Load netfilter bridge settings
+  command: sysctl -p /etc/sysctl.d/99-netfilter-bridge.conf
+  changed_when: false
+
+- name: Run modprobe
+  command: "modprobe {{ item }}"
+  with_items:
+    - br_netfilter
+    - overlay
+
+  changed_when: false
+
+- name: Create modprobe configuration
+  ansible.builtin.copy:
+    content: |
+      br_netfilter
+      overlay
+    dest: /etc/modules-load.d/br_netfilter.conf
+    mode: "0644"
+
+- name: Prepare bridged network configuration
+  ansible.builtin.copy:
+    content: |
+      <network>
+        <name>bridged-network</name>
+        <forward mode="bridge" />
+        <bridge name="br0" />
+      </network>
+    dest: /tmp/bridged-network.xml
+    mode: "0644"
+
+- name: Apply bridged network configuration
+  shell:
+    cmd: |
+      virsh net-define /tmp/bridged-network.xml
+      virsh net-start bridged-network
+      virsh net-autostart bridged-network
+  args:
+    executable: /bin/bash
   changed_when: false
