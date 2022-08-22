@@ -5,7 +5,7 @@ driver:
   name: docker
 platforms:
   - name: ansible-role-freehold
-    image: ghcr.io/avnes/molecule-centos-stream:latest
+    image: ghcr.io/avnes/molecule-centos-stream:8.0.1
     pre_build_image: true
     command: /sbin/init
     capabilities:

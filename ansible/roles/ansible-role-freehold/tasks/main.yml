@@ -96,7 +96,7 @@
       virsh pool-info default
   args:
     executable: /bin/bash
-  failed_when:
+  failed_when: false
   changed_when: false
 
 - name: Configure libvirt bridge network
@@ -152,13 +152,14 @@
 - name: Load netfilter bridge settings
   command: sysctl -p /etc/sysctl.d/99-netfilter-bridge.conf
   changed_when: false
+  tags: molecule-notest
 
 - name: Run modprobe
   command: "modprobe {{ item }}"
   with_items:
     - br_netfilter
     - overlay
-
+  failed_when: false
   changed_when: false
 
 - name: Create modprobe configuration
@@ -188,4 +189,5 @@
       virsh net-autostart bridged-network
   args:
     executable: /bin/bash
+  failed_when: false
   changed_when: false
