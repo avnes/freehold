@@ -42,7 +42,39 @@ systemctl start docker
 # Install and configure HA proxy on rancher-lb
 
 if [[ $(hostname) == 'rancher-lb' ]]; then
-    echo "Work in progress"
-    echo "This is the load balancer server" > /var/log/lb.txt
     dnf -y install haproxy
+    cat <<EOF | tee /etc/haproxy/conf.d/rancher.cfg
+#---------------------------------------------------------------------
+# Load balancing for Rancher
+#---------------------------------------------------------------------
+
+frontend rancher_frontend
+    bind *:80
+    mode tcp
+    option tcplog
+    default_backend rancher_backend
+
+frontend rancher_secure_frontend
+    bind *:443
+    mode tcp
+    option tcplog
+    default_backend rancher_secure_backend
+
+backend rancher_backend
+    mode tcp
+    balance source
+    server rancher-node01 10.0.1.41:80 check
+    server rancher-node02 10.0.1.42:80 check
+    server rancher-node03 10.0.1.43:80 check
+
+backend rancher_secure_backend
+    mode tcp
+    balance source
+    server rancher-node01 10.0.1.41:443 check
+    server rancher-node02 10.0.1.42:443 check
+    server rancher-node03 10.0.1.43:443 check
+EOF
+    systemctl enable haproxy
+    systemctl start haproxy
+    systemctl restart haproxy # Just in case it is already loaded and started
 fi
