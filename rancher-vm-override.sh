@@ -1,6 +1,7 @@
 #!/bin/bash
-nmcli con mod "System eth0" ipv4.dns "10.0.1.74 10.0.0.1 8.8.8.8"
-systemctl restart NetworkManager
+
+# Configure DNS
+curl https://raw.githubusercontent.com/avnes/freehold/main/vm-dns-override.sh | bash
 
 cat <<EOF | tee /etc/sysctl.d/99-kubernetes-cri.conf
 net.bridge.bridge-nf-call-iptables = 1
@@ -37,3 +38,10 @@ dnf install -y git
 
 systemctl enable docker
 systemctl start docker
+
+# Install and configure HA proxy on rancher-lb
+
+if [[ $(hostname) == 'rancher-lb' ]]; then
+    echo "Work in progress"
+    echo "This is the load balancer server" > /var/log/lb.txt
+fi
