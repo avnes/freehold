@@ -44,4 +44,5 @@ systemctl start docker
 if [[ $(hostname) == 'rancher-lb' ]]; then
     echo "Work in progress"
     echo "This is the load balancer server" > /var/log/lb.txt
+    dnf -y install haproxy
 fi
