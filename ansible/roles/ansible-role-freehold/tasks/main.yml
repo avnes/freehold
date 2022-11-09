@@ -102,10 +102,10 @@
 - name: Configure libvirt bridge network
   shell:
     cmd: |
-      ip link add bridge0 type bridge
+      ip link add br0 type bridge
       ip link set enp57s0u1 up
-      ip link set enp57s0u1 master bridge0
-      ip address add dev bridge0 10.0.2.74/24
+      ip link set enp57s0u1 master br0
+      ip address add dev br0 10.0.2.74/24
   args:
     executable: /bin/bash
   failed_when: false
@@ -157,7 +157,7 @@
       <network>
         <name>bridged-network</name>
         <forward mode="bridge" />
-        <bridge name="bridge0" />
+        <bridge name="br0" />
       </network>
     dest: /tmp/bridged-network.xml
     mode: "0644"
