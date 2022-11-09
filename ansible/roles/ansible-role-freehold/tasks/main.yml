@@ -102,43 +102,24 @@
 - name: Configure libvirt bridge network
   shell:
     cmd: |
-      ip link add br0 type bridge
-      ip link set ens8u1 up
-      ip link set ens8u1 master br0
-      ip address add dev br0 10.0.2.74/24
+      ip link add bridge0 type bridge
+      ip link set enp57s0u1 up
+      ip link set enp57s0u1 master bridge0
+      ip address add dev bridge0 10.0.2.74/24
   args:
     executable: /bin/bash
   failed_when: false
   changed_when: false
 
-- name: Create network script ifcfg-br0
-  ansible.builtin.copy:
-    content: |
-      DEVICE=br0
-      TYPE=Bridge
-      BOOTPROTO=none
-      IPADDR=10.0.2.74
-      GATEWAY=10.0.0.1
-      NETMASK=255.255.255.0
-      ONBOOT=yes
-      DELAY=0
-      NM_CONTROLLED=0
-    dest: /etc/sysconfig/network-scripts/ifcfg-br0
-    mode: "0644"
-
-- name: Create network script ifcfg-ens8u1
-  ansible.builtin.copy:
-    content: |
-      TYPE=ethernet
-      BOOTPROTO=none
-      NAME=ens8u1
-      DEVICE=ens8u1
-      ONBOOT=yes
-      BRIDGE=br0
-      DELAY=0
-      NM_CONTROLLED=0
-    dest: /etc/sysconfig/network-scripts/ifcfg-ens8u1
-    mode: "0644"
+- name: Configure primary network
+  shell:
+    cmd: |
+      nmcli con mod eno1 ipv4.dns "8.8.8.8 8.8.4.4"
+      nmcli con mod eno1 ipv4.dns-search "anyops.site"
+  args:
+    executable: /bin/bash
+  failed_when: false
+  changed_when: false
 
 - name: Create netfilter bridge
   ansible.builtin.copy:
@@ -176,7 +157,7 @@
       <network>
         <name>bridged-network</name>
         <forward mode="bridge" />
-        <bridge name="br0" />
+        <bridge name="bridge0" />
       </network>
     dest: /tmp/bridged-network.xml
     mode: "0644"
