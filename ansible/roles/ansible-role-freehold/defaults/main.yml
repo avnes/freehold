@@ -10,4 +10,3 @@ install_software:
   - cockpit
   - cockpit-machines
   - virt-manager
-  - network-scripts
