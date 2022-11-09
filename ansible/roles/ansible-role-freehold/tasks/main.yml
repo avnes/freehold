@@ -105,7 +105,7 @@
       ip link add bridge0 type bridge
       ip link set enp57s0u1 up
       ip link set enp57s0u1 master bridge0
-      ip address add dev bridge0 10.0.2.74/24
+      ip address add dev bridge0 10.0.2.74/22
   args:
     executable: /bin/bash
   failed_when: false
